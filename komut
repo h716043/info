@@ -1,0 +1,28 @@
+function mtel(tel){
+var alankod = '212'
+if   (tel.length==10) {tel =  tel.replace( /(\d{3})(\d{3})(\d{4})/,  '0($1) $2 $3' ) } ;
+else {tel =  tel.replace( /(\d{3})(\d{4})/,  '0('+alankod+') $1 $2' )};
+return tel}
+
+function info(isim,sorgu){
+var sqllang      = 'Turkish'
+var ids          = sql.Query("SET LANGUAGE "+sqllang+" SELECT TOP (1)  Tickets.Id FROM TicketEntities INNER JOIN Tickets ON TicketEntities.Ticket_Id = Tickets.Id WHERE EntityName in ('"+isim+"') AND Tickets.IsClosed = 1 ORDER BY TicketEntities.Ticket_Id DESC").First;
+var idss         = sql.Query("SET LANGUAGE "+sqllang+" SELECT DISTINCT Tickets.Id FROM TicketEntities INNER JOIN Tickets ON TicketEntities.Ticket_Id = Tickets.Id WHERE EntityName in ('"+isim+"') AND Tickets.IsClosed = 1").Join();
+var siparis      = sql.Query("SET LANGUAGE "+sqllang+" SELECT CONCAT('<block 1 transparent left 300>','<block 1 transparent left 30>',CONCAT(FORMAT(Quantity,'#.##'),'x'),'</block><block 1 trasparent left 200>',CONCAT(MenuItemName,CASE WHEN PortionName = 'Normal' THEN NULL Else  CONCAT('.',PortionName) END),'</block><block 1 transparent right 70>',Format(Price,'C'),'</block></block>') FROM Orders WHERE TicketId = "+ids+" ORDER BY Price DESC").Join('<br/>');
+var toplam       = sql.Query("SET LANGUAGE "+sqllang+" SELECT FORMAT(TotalAmount , 'C') FROM Tickets WHERE IsClosed = 1 AND Id = "+ids+"").First;
+var genel        = sql.Query("SET LANGUAGE "+sqllang+" SELECT FORMAT(SUM(TotalAmount) , 'C') AS 'Currency Format'  FROM Tickets WHERE IsClosed = 1 AND Id IN ("+idss+")").First;
+var adet         = sql.Query("SET LANGUAGE "+sqllang+" SELECT COUNT(Tickets.Id) FROM TicketEntities INNER JOIN Tickets ON TicketEntities.Ticket_Id = Tickets.Id WHERE EntityName in ('"+isim+"') AND Tickets.IsClosed = 1").First;
+var gun          = sql.Query("SET LANGUAGE "+sqllang+" SELECT DATEDIFF(day,Date,GETDATE()) FROM Tickets WHERE IsClosed = 1 AND Id = "+ids+"").First; if(gun==null){var gun = 'Siparişi Yoktur'};if(gun=='0'){var gun = 'Bugün'} else {var gun = gun};if(gun=='Siparişi Yoktur '){var gun =   "<block 1 transparent right 190><color red><b>!!! Siparişi Yoktur !!! </b></color></block>"};if(gun=='Bugün'){var gun =   "<block 1 transparent right 190><b>Bugün </b></block>"}; if(gun>'30'){var gun =   "<block 1 transparent right 190><color red><b> "+gun+"</b></color> gün</block>"};else {var gun =  "<block 1 transparent right 190><b> "+gun+"</b> gün </block>"};
+var tarih        = sql.Query("SET LANGUAGE "+sqllang+" SELECT Date FROM Tickets WHERE IsClosed = 1 AND Id = "+ids+"").First;
+var ortalama     = sql.Query("SET LANGUAGE "+sqllang+" SELECT FORMAT((SUM(TotalAmount)/COUNT(Tickets.Id)) , 'C') FROM TicketEntities INNER JOIN Tickets ON TicketEntities.Ticket_Id = Tickets.Id WHERE EntityName in ('"+isim+"') AND Tickets.IsClosed = 1").First;
+var sonuc        = {'ids':''+ids+'','adet':''+adet+'','siparis':''+siparis+'','toplam':''+toplam+'','genel':''+genel+'','gun':''+gun+'','tarih':''+tarih+'','ortalama':''+ortalama+''}
+return sonuc[sorgu]}
+
+
+function bakiye(tutar){
+if (tutar>'0,00')  {return "<br/><block 1 transparent left 70><i>Bakiye</i></block>:  <block 1 transparent left 320><color darkred><b>"+tutar+"</b></color> ₺ Borcu Vardır</block>"}; 
+if (tutar=='')     {return "<br/><block 1 transparent left 70><i>Bakiye</i></block>:  <block 1 transparent left 320>Hesabı Yok</block>"}; 
+if (tutar<'0,00')  {return "<br/><block 1 transparent left 70><i>Bakiye</i></block>:  <block 1 transparent left 320><color green><b>"+tutar.replace('-','')+"</b></color> ₺ Kredisi Vardır</block>"}; 
+if (tutar=='0,00') {return "<br/><block 1 transparent left 70><i>Bakiye</i></block>:  <block 1 transparent left 320>Borcu Yok</block>"}; 
+}
+
