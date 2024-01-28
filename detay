@@ -1,0 +1,36 @@
+<block 2 black left 405>
+<block 5 #FFF5F05D left 400><color navy>
+<block 1 transparent left 70><i>Müşteri</i></block>:  <block 1 transparent left 320><b>$1</b></block><br/>
+<block 1 transparent left 70><i>Telefon</i></block>:  <block 1 transparent left 310><b>{CALL:detay.mtel('{ENTITY DATA:Telefon}')}</b></block><br/>
+<block 1 transparent left 70><i>Adresi</i></block>: <block 1 transparent left 320 wrap> {ENTITY DATA:Adres}</block>
+{CALL:detay.bakiye('{ENTITY BALANCE}')}
+</color></block> 
+<br/><block 0 black left 405><size 1>.</size></block>
+<br/>
+<block 10 lightgreen left 400>
+<block 1 transparent center 340><b>Sipariş Bilgileri</b></block><br/>
+<block 1 transparent left 150>Adisyon Adedi</block>:  <block 1 transparent right 190><b>{CALL:detay.info('$1','adet')}</b> Adet </block><br/>
+<block 1 transparent left 150>Sipariş Toplamı</block>: <block 1 transparent right 190><b>{CALL:detay.info('$1','genel')}</b></block><br/>
+<block 1 transparent left 150>Sipariş Ortalama</block>: <block 1 transparent right 190><b>{CALL:detay.info('$1','ortalama')}</b></block><br/>
+<block 1 transparent left 150>Son Sipariş Tarih</block>: {CALL:detay.info('$1','gun')}<br/>
+<block 1 transparent right 360><b>{CALL:detay.info('$1','tarih')}</b></block>
+</block>
+<br/><block 0 black left 405><size 1>.</size></block>
+<br/>
+<block 10 skyblue left 400><color darkred>
+<block 1 transparent left 100><b>Son Siparişi </b></block>
+<block 1 transparent center 130>#( {CALL:detay.info('$1','ids')} )</block>
+<block 1 transparent right 70><b>{CALL:detay.info('$1','toplam')}</b></block><br/>
+<size 15>{CALL:detay.info('$1','siparis')}</size>
+</color></block>
+<br/><block 0 black left 405><size 1>.</size></block>
+<br/>
+<block 10 #FFFC9AFC left 400><color darkred>
+<block 1 transparent left 110><b>Aktif Siparişi </b></block><block 1 transparent center 120>#( {REPORT TICKET DETAILS:T.Id:Ticket.RemainingAmount>0 AND (TEN.Müşteri=$1):-} )</block><block 1 transparent right 70><b>{REPORT TICKET DETAILS:,M([T.TotalAmount]):Ticket.RemainingAmount>0 AND (TEN.Müşteri=$1)}</b></block><br/>
+<size 15><block 1 transparent left 300>
+{REPORT ORDER DETAILS:O.Quantity;#x,O.MenuItemName,M([O.Price]).desc:Ticket.RemainingAmount>0 AND (TEN.Müşteri=$1) AND (ODI=True):
+<block 1 transparent left 30>{0}</block><block 1 trasparent left 200>{1}</block><block 1 transparent right 70>{2}</block><br/>}
+</block></size>
+</color></block>
+
+</block>
